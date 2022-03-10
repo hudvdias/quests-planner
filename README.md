@@ -2,6 +2,17 @@
 
 ## Work in progress ⚠
 
+## Applied Knowledge
+
+- Typescript
+- ReactJs
+- NextJS
+- NextAuth
+- Social Login with OAuth
+- API
+- GraphQL
+- Headless CMS
+
 ## Run the project
 
 1. Clone this repo;
