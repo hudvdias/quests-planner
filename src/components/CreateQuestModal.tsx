@@ -83,7 +83,10 @@ export const CreateQuestModal: React.FC<CreateQuestModalProps> = ({
         <ModalBody>
           <FormControl isRequired isInvalid={titleError}>
             <FormLabel>Título</FormLabel>
-            <Input onChange={(event) => setTitle(event.target.value)} />
+            <Input
+              onChange={(event) => setTitle(event.target.value)}
+              autoFocus
+            />
             <FormErrorMessage>
               <FormErrorIcon />
               <Text>O título da missão é obrigatório.</Text>

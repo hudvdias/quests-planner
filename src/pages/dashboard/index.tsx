@@ -14,14 +14,12 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { CreateQuestModal } from "../../components/CreateQuestModal";
 import { Layout } from "../../components/Layout";
 import { QuestListItem } from "../../components/QuestListItem";
 import { useQuest } from "../../hooks/useQuest";
-import { api } from "../../services/axios";
 
 const Dashboard: NextPage = () => {
   const [loading, setLoading] = useState(true);
