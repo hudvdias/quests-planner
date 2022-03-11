@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { api } from "../services/axios";
 import { Quest } from "../types/types";
+import { reorderQuests } from "../utils/reorderQuests";
 
 type QuestContextProps = {
   quests: Quest[];
@@ -17,25 +18,9 @@ const QuestProvider: React.FC = ({ children }) => {
 
   const getUserQuests = async () => {
     try {
-      const response = await api.get("/quests");
-      const { quests } = response.data;
+      const response = await api.get<Quest[]>("/quests");
 
-      // refactor this code
-      const sortedQuests = [];
-
-      sortedQuests.push(
-        ...quests.filter((quest: Quest) => quest.questStatus === "progress")
-      );
-      sortedQuests.push(
-        ...quests.filter((quest: Quest) => quest.questStatus === "waiting")
-      );
-      sortedQuests.push(
-        ...quests.filter((quest: Quest) => quest.questStatus === "todo")
-      );
-      sortedQuests.push(
-        ...quests.filter((quest: Quest) => quest.questStatus === "completed")
-      );
-      //
+      const sortedQuests = reorderQuests(response.data);
 
       setQuests(sortedQuests);
     } catch (error: any) {
@@ -47,9 +32,12 @@ const QuestProvider: React.FC = ({ children }) => {
 
   const createQuest = async (title: string) => {
     try {
-      await api.post("/quests", { title });
+      const response = await api.post<Quest>("/quests", { title });
+      const newQuest = response.data;
 
-      await getUserQuests();
+      const newQuests = [...quests, newQuest];
+      const orderedQuests = reorderQuests(newQuests);
+      setQuests(orderedQuests);
     } catch (error: any) {
       throw new Error(error.message);
     }
@@ -59,9 +47,14 @@ const QuestProvider: React.FC = ({ children }) => {
 
   const changeQuestStatus = async (id: string, questStatus: string) => {
     try {
-      await api.put("/quests", { id, questStatus });
+      const response = await api.put<Quest>("/quests", { id, questStatus });
+      const updatedQuest = response.data;
 
-      await getUserQuests();
+      const newQuests = quests.map((item) =>
+        item.id === updatedQuest.id ? updatedQuest : item
+      );
+      const orderedQuests = reorderQuests(newQuests);
+      setQuests(orderedQuests);
     } catch (error: any) {
       throw new Error(error.message);
     }
@@ -71,9 +64,11 @@ const QuestProvider: React.FC = ({ children }) => {
 
   const deleteQuest = async (id: string) => {
     try {
-      await api.delete("/quests", { data: { id } });
+      const response = await api.delete<Quest>("/quests", { data: { id } });
+      const deletedQuest = response.data;
 
-      await getUserQuests();
+      const newQuests = quests.filter((item) => item.id !== deletedQuest.id);
+      setQuests(newQuests);
     } catch (error: any) {
       throw new Error(error.message);
     }

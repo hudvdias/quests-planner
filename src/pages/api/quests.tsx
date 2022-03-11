@@ -9,10 +9,6 @@ const getQuestsByUserEmail = gql`
       id
       title
       questStatus
-      category {
-        id
-        title
-      }
     }
   }
 `;
@@ -24,7 +20,7 @@ const CreateQuestWithUserEmail = gql`
     $email: String!
     $routine: Boolean!
   ) {
-    questId: createQuest(
+    quest: createQuest(
       data: {
         title: $title
         questStatus: $questStatus
@@ -33,25 +29,31 @@ const CreateQuestWithUserEmail = gql`
       }
     ) {
       id
+      title
+      questStatus
     }
   }
 `;
 
 const ChangeQuestStatusById = gql`
   mutation ChangeQuestStatusById($id: ID!, $questStatus: QuestStatus!) {
-    questId: updateQuest(
+    quest: updateQuest(
       data: { questStatus: $questStatus }
       where: { id: $id }
     ) {
       id
+      title
+      questStatus
     }
   }
 `;
 
 const DeleteQuestById = gql`
   mutation DeleteQuestById($id: ID!) {
-    deletedQuestId: deleteQuest(where: { id: $id }) {
+    deletedQuest: deleteQuest(where: { id: $id }) {
       id
+      title
+      questStatus
     }
   }
 `;
@@ -69,7 +71,7 @@ const QuestsApi: NextApiHandler = async (request, response) => {
         email: session.user.email,
       });
 
-      return response.status(200).json({ quests });
+      return response.status(200).json(quests);
     } catch (error: any) {
       return response.status(500).json({ error: error.message });
     }
@@ -85,14 +87,14 @@ const QuestsApi: NextApiHandler = async (request, response) => {
     }
 
     try {
-      const { questId } = await graphcms.request(CreateQuestWithUserEmail, {
+      const { quest } = await graphcms.request(CreateQuestWithUserEmail, {
         title,
         questStatus: "todo",
         email: session.user.email,
         routine: false, //Future feature data
       });
 
-      return response.status(201).json({ questId });
+      return response.status(201).json(quest);
     } catch (error: any) {
       return response.status(500).json({ error: error.message });
     }
@@ -106,12 +108,12 @@ const QuestsApi: NextApiHandler = async (request, response) => {
     }
 
     try {
-      const { questId } = await graphcms.request(ChangeQuestStatusById, {
+      const { quest } = await graphcms.request(ChangeQuestStatusById, {
         id,
         questStatus,
       });
 
-      response.status(200).json({ questId });
+      response.status(200).json(quest);
     } catch (error: any) {
       return response.status(500).json({ error: error.message });
     }
@@ -123,9 +125,11 @@ const QuestsApi: NextApiHandler = async (request, response) => {
     }
 
     try {
-      const deletedQuestId = await graphcms.request(DeleteQuestById, { id });
+      const { deletedQuest } = await graphcms.request(DeleteQuestById, {
+        id,
+      });
 
-      return response.status(200).json({ deletedQuestId });
+      return response.status(200).json(deletedQuest);
     } catch (error: any) {
       return response.status(500).json({ error: error.message });
     }
