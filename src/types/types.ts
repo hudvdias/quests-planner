@@ -3,3 +3,11 @@ export type Quest = {
   title: string;
   questStatus: string;
 };
+
+export type Category = {
+  id: string;
+  title: string;
+  quests: {
+    id: string;
+  }[];
+};

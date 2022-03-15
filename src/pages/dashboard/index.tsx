@@ -1,118 +1,51 @@
-import {
-  Box,
-  Button,
-  Center,
-  CircularProgress,
-  Container,
-  Flex,
-  Heading,
-  Image,
-  Stack,
-  StackDivider,
-  Text,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useSession } from "next-auth/react";
 import Head from "next/head";
-import { useEffect, useState } from "react";
-import { CreateQuestModal } from "../../components/CreateQuestModal";
-import { Layout } from "../../components/Layout";
-import { QuestListItem } from "../../components/QuestListItem";
-import { useQuest } from "../../hooks/useQuest";
-import { api } from "../../services/axios";
+import {
+  HiCalendar,
+  HiDotsVertical,
+  HiExclamationCircle,
+} from "react-icons/hi";
+import { Header } from "../../components/Header";
 
 const Dashboard: NextPage = () => {
-  const [loading, setLoading] = useState(true);
-
-  const { quests, getUserQuests } = useQuest();
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
-
-  useEffect(() => {
-    getUserQuests()
-      .then(() => setLoading(false))
-      .catch((error) => {
-        toast({
-          title: "Erro ao carregar missões.",
-          description: error.message,
-          status: "error",
-          variant: "left-accent",
-          isClosable: true,
-          position: "top-right",
-        });
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleCreateQuest = () => {
-    onOpen();
-  };
-
   return (
     <>
       <Head>
-        <title>Missões | Planner</title>
+        <title>Missões | Quests-Planner</title>
       </Head>
-      <Layout>
-        <Container maxW="container.md">
-          <Flex align="end" my="8" as="header">
-            <Heading>Missões</Heading>
-            {!loading && quests.length > 0 && (
-              <Button
-                colorScheme="blue"
-                fontSize="sm"
-                ml="auto"
-                onClick={() => handleCreateQuest()}
+      <div className="flex-col h-screen w-screen bg-gray-200">
+        <Header />
+        <main className="text-gray-800 p-4">
+          <div>
+            <h2 className="mb-2 text-xl font-bold">Categorias</h2>
+            <div className="py-1 px-2 border w-max border-gray-500  rounded">
+              <p className="text-sm">Categoria</p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <h2 className="mb-2 text-xl font-bold">Missões</h2>
+            <div className="bg-gray-50 text-gray-600 p-4 shadow rounded-md flex items-center">
+              <HiExclamationCircle className="text-xl mr-2" />
+              <p className="flex grow">Título da missão</p>
+              <p className="text-sm mx-2">Categoria</p>
+              <div className="flex items-center text-sm mx-2">
+                <HiCalendar className="mr-1" />
+                <p>29/03/2022</p>
+              </div>
+              <select
+                name="status"
+                className="text-sm mx-2 border border-gray-600 rounded"
               >
-                Nova missão
-              </Button>
-            )}
-          </Flex>
-          {loading ? (
-            <Center flexDirection="column">
-              <CircularProgress
-                isIndeterminate
-                color="blue.500"
-                mb="4"
-                capIsRound
-              />
-              <Text>Carregando missões...</Text>
-            </Center>
-          ) : (
-            <>
-              {quests.length > 0 ? (
-                <Box bg="gray.50" borderRadius="lg" shadow="md" p="4">
-                  <Stack divider={<StackDivider />} spacing="4">
-                    {quests.map((quest) => {
-                      return <QuestListItem quest={quest} key={quest.id} />;
-                    })}
-                  </Stack>
-                </Box>
-              ) : (
-                <Center flexDirection="column">
-                  <Image
-                    src="/images/undraw_adventure_map_hnin.svg"
-                    alt="no data"
-                    boxSize="300px"
-                  />
-                  <Text>Você ainda não tem nenhuma missão...</Text>
-                  <Button
-                    onClick={() => handleCreateQuest()}
-                    colorScheme="blue"
-                    mt="4"
-                  >
-                    Criar missão
-                  </Button>
-                </Center>
-              )}
-            </>
-          )}
-        </Container>
-        <CreateQuestModal isOpen={isOpen} onClose={onClose} />
-      </Layout>
+                <option value="">A Fazer</option>
+                <option value="">Em progresso</option>
+                <option value="">Aguardando</option>
+                <option value="">Concluída</option>
+              </select>
+              <HiDotsVertical className="ml-2" />
+            </div>
+          </div>
+        </main>
+      </div>
     </>
   );
 };
