@@ -18,14 +18,12 @@ const CreateQuestWithUserEmail = gql`
     $title: String!
     $questStatus: QuestStatus!
     $email: String!
-    $routine: Boolean!
   ) {
     quest: createQuest(
       data: {
         title: $title
         questStatus: $questStatus
         nextAuthUser: { connect: { email: $email } }
-        routine: $routine
       }
     ) {
       id
@@ -91,11 +89,11 @@ const QuestsApi: NextApiHandler = async (request, response) => {
         title,
         questStatus: "todo",
         email: session.user.email,
-        routine: false, //Future feature data
       });
 
       return response.status(201).json(quest);
     } catch (error: any) {
+      console.log(error);
       return response.status(500).json({ error: error.message });
     }
   } else if (request.method === "PUT") {
